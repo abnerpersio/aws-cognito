@@ -1,7 +1,8 @@
 service: live020
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 plugins:
+  - serverless-offline
   - serverless-esbuild
 
 package:
@@ -14,18 +15,19 @@ provider:
   deploymentMethod: direct
   architecture: arm64
 
+build:
+  esbuild: false
+
 custom:
   esbuild:
-  bundle: true
-  minify: true
-  sourcemap: false
-  target: node20
-  exclude:
-    - '@aws-sdk/*'
-  define:
-    require.resolve: undefined
-  platform: node
-  concurrency: 10
+    bundle: true
+    minify: true
+    sourcemap: false
+    target: node20
+    exclude:
+      - '@aws-sdk/*'
+    platform: node
+    concurrency: 10
 
 functions:
   hello:
