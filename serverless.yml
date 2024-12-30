@@ -85,3 +85,21 @@ functions:
       - httpApi:
           method: POST
           path: /auth/sign-up
+  accountConfirmation:
+    handler: src/functions/account-confirmation.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/account-confirmation
+  signIn:
+    handler: src/functions/sign-in.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/sign-in
+  refreshToken:
+    handler: src/functions/refresh-token.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/refresh-token
