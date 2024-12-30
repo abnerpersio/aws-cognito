@@ -14,6 +14,8 @@ provider:
   runtime: nodejs20.x
   deploymentMethod: direct
   architecture: arm64
+  environment:
+    COGNITO_CLIENT_ID: !Ref LiveUserPoolClient
 
 build:
   esbuild: false
@@ -29,10 +31,57 @@ custom:
     platform: node
     concurrency: 10
 
+resources:
+  Resources:
+    LiveUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: LiveUserPool
+        MfaConfiguration: OFF
+        DeletionProtection: INACTIVE
+        AutoVerifiedAttributes:
+          - email
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: false
+        UsernameAttributes:
+          - email
+        AccountRecoverySetting:
+          RecoveryMechanisms:
+            - Name: verified_email
+              Priority: 1
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 10
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireSymbols: false
+            RequireUppercase: false
+            TemporaryPasswordValidityDays: 2
+        Schema:
+          - Name: given_name
+            AttributeDataType: String
+            Mutable: true
+          - Name: family_name
+            AttributeDataType: String
+            Mutable: true
+    LiveUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: LiveUserPoolClient
+        UserPoolId: !Ref LiveUserPool
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        TokenValidityUnits:
+          AccessToken: hours
+          RefreshToken: hours
+        AccessTokenValidity: 3
+        RefreshTokenValidity: 1440 # 60 days
+
 functions:
-  hello:
-    handler: src/functions/hello.handler
+  signUp:
+    handler: src/functions/sign-up.handler
     events:
       - httpApi:
-          method: GET
-          path: /hello
+          method: POST
+          path: /auth/sign-up
