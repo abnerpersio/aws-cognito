@@ -47,8 +47,6 @@ export async function handler(event: APIGatewayProxyEventV2) {
       refreshToken: AuthenticationResult.RefreshToken,
     });
   } catch (error) {
-    console.log('error', error);
-
     return response(500);
   }
 }
